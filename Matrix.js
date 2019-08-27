@@ -1,8 +1,8 @@
 class Matrix {
   constructor(matrixArray) {
     this.baseMatrix = [...matrixArray];
-    this.width = this.baseMatrix[0].length;
-    this.height = this.baseMatrix.length;
+    this.widthIndex = this.baseMatrix[0].length - 1;
+    this.heightIndex = this.baseMatrix.length - 1;
     this.nodes = Matrix.mapMatrix(this.baseMatrix);
   }
 
@@ -29,11 +29,44 @@ class Matrix {
     return this.nodes;
   }
 
-  availablePaths(currentStep, matrix) {
+  nextSteps(currentStep, matrix) {
     const { node, history } = currentStep;
+    const availableStepsArray = [];
+    const checkOrder = ["top", "bottom", "left", "right"];
+    const newHistory = [...history];
+    newHistory.push(node);
 
-    console.log(node);
-    console.log(matrix);
+    let movement;
+    for (let item of checkOrder) {
+      switch (item) {
+        case "top":
+          movement = this.getNode(node.x, node.y - 1);
+          break;
+        case "bottom":
+          movement = this.getNode(node.x, node.y + 1);
+          break;
+        case "left":
+          movement = this.getNode(node.x - 1, node.y);
+          break;
+        case "right":
+          movement = this.getNode(node.x + 1, node.y);
+          break;
+        default:
+          break;
+      }
+
+      //validate history
+      if (movement) {
+        if (
+          (movement.value === 1 || movement.value === 9) &&
+          !newHistory.includes(movement)
+        ) {
+          availableStepsArray.push(new Step(movement, newHistory));
+        }
+      }
+    }
+
+    return availableStepsArray;
   }
 
   findPath([fromX, fromY], [toX, toY]) {
@@ -46,11 +79,17 @@ class Matrix {
     }
 
     const initialPosition = new Step(this.getNode(fromX, fromY), []);
-    const queue = [initialPosition];
+    let queue = [initialPosition];
 
-    while (queue.length > 0) {
+    while (queue.length) {
       let currentStep = queue.shift();
-      let nextSteps = this.availablePaths(currentStep, this.nodes);
+      if (currentStep.node.x === toX && currentStep.node.y === toY) {
+        console.log(currentStep);
+      }
+      let nextSteps = this.nextSteps(currentStep, this.nodes);
+      for (let step of nextSteps) {
+        queue.push(step);
+      }
     }
   }
 }
