@@ -7,8 +7,7 @@ class Matrix {
   }
 
   static checkVectorPostion(x, y, baseMatrix) {
-    return baseMatrix[y] ? true : false;
-    return baseMatrix[y][x] ? true : false;
+    return baseMatrix[y] ? (baseMatrix[y][x] ? true : false) : false;
   }
 
   static mapMatrix(matrix) {
@@ -84,7 +83,7 @@ class Matrix {
     while (queue.length) {
       let currentStep = queue.shift();
       if (currentStep.node.x === toX && currentStep.node.y === toY) {
-        console.log(currentStep);
+        return(currentStep);
       }
       let nextSteps = this.nextSteps(currentStep, this.nodes);
       for (let step of nextSteps) {
